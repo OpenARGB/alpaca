@@ -69,6 +69,14 @@
 // no prefetching
 #define ALPACA_PREFETCH(location) ;
 #endif
+// Untesteted ESP32 support
+#elif defined(ESP_PLATFORM)
+#define __ALPACA_BYTE_ORDER __ALPACA_LITTLE_ENDIAN
+#ifdef __GNUC__
+#define ALPACA_PREFETCH(location) __builtin_prefetch(location)
+#else
+#define ALPACA_PREFETCH(location) ;
+#endif
 #else
 #error unsupported system
 #endif
