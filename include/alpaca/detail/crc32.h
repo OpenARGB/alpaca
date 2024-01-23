@@ -71,6 +71,14 @@
 #endif
 // Untesteted ESP32 support
 #elif defined(ESP_PLATFORM)
+#define NO_LUT
+#undef CRC32_USE_LOOKUP_TABLE_BYTE
+#undef CRC32_USE_LOOKUP_TABLE_SLICING_BY_4
+#undef CRC32_USE_LOOKUP_TABLE_SLICING_BY_8
+#undef CRC32_USE_LOOKUP_TABLE_SLICING_BY_16
+#define CRC32_USE_ESP32_CRC32
+#include <esp32/rom/crc.h>
+
 #define __ALPACA_BYTE_ORDER __ALPACA_LITTLE_ENDIAN
 #ifdef __GNUC__
 #define ALPACA_PREFETCH(location) __builtin_prefetch(location)
@@ -1284,6 +1292,8 @@ static inline uint32_t crc32_fast(const void *data, size_t length,
   return crc32_4bytes(data, length, previousCrc32);
 #elif defined(CRC32_USE_LOOKUP_TABLE_BYTE)
   return crc32_1byte(data, length, previousCrc32);
+#elif defined(CRC32_USE_ESP32_CRC32)
+  return crc32_le(previousCrc32, static_cast<const uint8_t *>(data), length);
 #else
   return crc32_halfbyte(data, length, previousCrc32);
 #endif
